@@ -1,0 +1,91 @@
+LOG ANALYSIS:
+`````````````
+# cd /var/log/httpd/
+
+LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-agent}i\"" combined
+
+Like:
+`````
+192.168.206.100 - - [23/Sep/2025:15:18:17 +0530] "GET /favicon.ico HTTP/1.1" 404 196 "http://cdac.com/" "Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101 Firefox/102.0"
+
+
+
+
+
+
+%h	: Host IP [ Client's IP ]
+%l	: [Remote logname] - "hyphen"
+%u	: userid
+%t	: [day/month/year:hour:minute:second zone]
+			day = 2*digit
+			month = 3*letter
+			year = 4*digit
+			hour = 2*digit
+			minute = 2*digit
+			second = 2*digit
+\"%r\"	:	The request line from the client is given in double quotes
+%s	:	HTTP Status Code
+%b	:	The size of the object returned to the client
+\"%{Referer}i\"	:	The "Referer" HTTP request header.
+\"%{User-agent}i\"	: User-Agent
+
+------------------------------------
+Apache Hardening Service Security:
+````````````````````````````````````
+1) Hide Apache Version and OS Information:
+```````````````````````````````````````````
+# vim /etc/httpd/conf/httpd.conf
+
+ServerTokens Prod
+ServerSignature Off
+
+NOTE: ServerSignature will remove the version information from the page generated
+like 403, 404, 502 etc...
+
+# systemctl restart httpd
++++++++++++++++++++++++
+If we want to remove information about PHP, we have to edit the php.ini configuration file. The directive should be changed from:
+
+expose_php = On
+
+to:
+
+expose_php = Off
+
+
+
+
+2) Disable Directory Listing:
+``````````````````````````````
+<Directory /home/sniper/public_html/lol>
+	Options -Indexes
+</Directory>
+
+
+
+
+
+
+
+
+
+
+3) Restrict Access to Sensitive Directories:
+`````````````````````````````````````````````
+<VirtualHost *:80>
+    ServerName example.com
+    DocumentRoot /var/www/html
+
+    # Other virtual host settings
+
+    <Directory /var/www/html/sensitive_directory>
+        Require all denied
+    </Directory>
+</VirtualHost>
+
+EXAMPLE:
+````````
+    <Directory /var/www/html/sensitive_directory>
+        Order allow,deny
+	Allow from ???
+    </Directory>
