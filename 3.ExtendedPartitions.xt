@@ -1,0 +1,392 @@
+# LINUX PARTITIONS
+
+1. PARTITION UTILITY
+   ====================
+
+For creating and managing partitions, we use a utility called:
+
+```
+fdisk
+```
+
+# 2. CHECK PARTITION TABLE
+
+To check the existing partition table:
+
+```
+fdisk -l
+```
+
+# 3. ENTER INTO FDISK
+
+To create or modify partitions, enter the disk using:
+
+```
+fdisk /dev/nvme0n1
+```
+
+# 4. FDISK COMMANDS
+
+## p
+
+Used to display the partition table.
+
+```
+p
+```
+
+## n
+
+Used to create a new partition.
+
+```
+n
+```
+
+After entering:
+
+```
+n
+```
+
+Select the partition type.
+
+Primary Partition:
+
+```
+p
+```
+
+Extended Partition:
+
+```
+e
+```
+
+Specify the partition size.
+
+Example:
+
+```
++10G
+```
+
+After creating the partition, write and save the partition table:
+
+```
+w
+```
+
+# 5. REREAD THE PARTITION TABLE
+
+After saving the partition table, Linux needs to reread the updated partition table.
+
+Use:
+
+```
+partprobe
+```
+
+Alternatively, restart/reboot the system so that Linux rereads the partition table.
+
+6. FORMAT THE PARTITION
+   =======================
+
+After creating the partition, format it with the required filesystem.
+
+Example using XFS:
+
+```
+mkfs.xfs /dev/nvme0n1p4
+```
+
+# 7. MOUNTING THE PARTITION
+
+After formatting the partition, it needs to be mounted.
+
+## TEMPORARY MOUNTING
+
+Create a mount point:
+
+```
+mkdir /data1
+```
+
+Mount the partition:
+
+```
+mount /dev/nvme0n1p4 /data1
+```
+
+Check the mounted filesystem:
+
+```
+df -h
+```
+
+## UNMOUNTING
+
+To unmount:
+
+```
+umount /dev/nvme0n1p4
+```
+
+# 8. PERMANENT MOUNTING
+
+To make the mount permanent, edit:
+
+```
+vim /etc/fstab
+```
+
+Go to the end of the file and add:
+
+```
+/dev/nvme0n1p4 /data1 xfs defaults 0 0
+```
+
+Save the file.
+
+9. RELOAD SYSTEMD DAEMON
+   ========================
+
+Reload the systemd daemon:
+
+```
+systemctl daemon-reload
+```
+
+Mount all filesystems mentioned in /etc/fstab:
+
+```
+mount -a
+```
+
+Check:
+
+```
+df -h
+```
+
+# 10. DELETING A PARTITION
+
+Before deleting a partition, first unmount it.
+
+## Step 1: Unmount the partition
+
+```
+umount /dev/nvme0n1p4
+```
+
+Check the mounted filesystems:
+
+```
+df -h
+```
+
+## Step 2: Remove the entry from /etc/fstab
+
+Edit:
+
+```
+vim /etc/fstab
+```
+
+Delete the entry:
+
+```
+/dev/nvme0n1p4 /data1 xfs defaults 0 0
+```
+
+## Step 3: Reload the daemon
+
+```
+systemctl daemon-reload
+```
+
+## Step 4: Enter fdisk
+
+```
+fdisk /dev/nvme0n1
+```
+
+Check the partition table:
+
+```
+p
+```
+
+Delete the partition:
+
+```
+d
+```
+
+Select the partition that needs to be deleted.
+
+Write and save the changes:
+
+```
+w
+```
+
+## Step 5: Reread the partition table
+
+```
+partprobe
+```
+
+# 11. COMPLETE PARTITION WORKFLOW
+
+Check existing partitions:
+
+```
+fdisk -l
+```
+
+Enter fdisk:
+
+```
+fdisk /dev/nvme0n1
+```
+
+Check partition table:
+
+```
+p
+```
+
+Create new partition:
+
+```
+n
+```
+
+Select partition type:
+
+```
+p
+```
+
+Specify size:
+
+```
++10G
+```
+
+Write changes:
+
+```
+w
+```
+
+Reread partition table:
+
+```
+partprobe
+```
+
+Format partition:
+
+```
+mkfs.xfs /dev/nvme0n1p4
+```
+
+Create mount point:
+
+```
+mkdir /data1
+```
+
+Temporarily mount:
+
+```
+mount /dev/nvme0n1p4 /data1
+```
+
+Check:
+
+```
+df -h
+```
+
+For permanent mounting, edit:
+
+```
+vim /etc/fstab
+```
+
+Add:
+
+```
+/dev/nvme0n1p4 /data1 xfs defaults 0 0
+```
+
+Reload daemon:
+
+```
+systemctl daemon-reload
+```
+
+Mount all filesystems:
+
+```
+mount -a
+```
+
+# 12. PARTITION DELETION WORKFLOW
+
+Unmount:
+
+```
+umount /dev/nvme0n1p4
+```
+
+Check:
+
+```
+df -h
+```
+
+Remove entry from:
+
+```
+/etc/fstab
+```
+
+Reload daemon:
+
+```
+systemctl daemon-reload
+```
+
+Enter fdisk:
+
+```
+fdisk /dev/nvme0n1
+```
+
+Check:
+
+```
+p
+```
+
+Delete:
+
+```
+d
+```
+
+Save:
+
+```
+w
+```
+
+Reread partition table:
+
+```
+partprobe
+```
